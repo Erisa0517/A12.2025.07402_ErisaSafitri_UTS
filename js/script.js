@@ -165,13 +165,33 @@ interestForm.addEventListener("submit", (event) => {
     return;
   }
 
+if (!interestForm.checkValidity()) {
+  event.stopPropagation();
+  interestForm.classList.add("was-validated");
+  const firstInvalid = interestForm.querySelector(":invalid");
+  if (firstInvalid) firstInvalid.focus();
+  showToast("Periksa kembali kolom wajib pada formulir.");
+  return;
+}
+
+const quantityInput = document.getElementById("productQuantity");
+const quantity = Number(quantityInput.value);
+
+if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+  quantityInput.setCustomValidity("Jumlah harus berupa bilangan bulat dari 1 sampai 100.");
+  quantityInput.reportValidity();
+  return;
+}
+
+quantityInput.setCustomValidity("");
+
   const newEntry = {
     id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     name: document.getElementById("customerName").value.trim(),
     phone: document.getElementById("customerPhone").value.trim(),
     product: document.getElementById("productSelect").value,
     size: document.getElementById("productSize").value,
-    quantity: Number(document.getElementById("productQuantity").value),
+    quantity: quantity,
     note: document.getElementById("customerNote").value.trim(),
     createdAt: new Date().toISOString()
   };
